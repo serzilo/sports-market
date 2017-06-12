@@ -1,0 +1,12 @@
+.calc-font(@size: 16) {
+    @font-size: @size / @base-font-size;
+
+    font-size: unit(@font-size, em);
+}
+
+.calc-font(@size; @line-height) {
+    @font-size: @size / @base-font-size;
+
+    font-size: unit(@font-size, em);
+    line-height: @line-height / @size;
+}

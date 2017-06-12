@@ -71,7 +71,7 @@ gulp.task('fonts', function() {
 
 // HTML pages
 gulp.task('pages', function() {
-    src.pages = ['pages/**/*', 'layouts/**/*', 'partials/**/*'];
+    src.pages = ['pages/**/*', 'layouts/**/*', 'includes/**/*'];
     return gulp.src(src.pages[0])
         .pipe($.if(/\.jade$/, $.jade({
             pretty: !RELEASE,
