@@ -54,18 +54,18 @@ gulp.task('clean', del.bind(null, ['build/*', '!build/.git'], { dot: true }));
 
 // Images
 gulp.task('images', function() {
-    src.images = 'images/**';
+    src.images = 'example_images/**';
     return gulp.src(src.images)
         .pipe($.cache($.imagemin({
             progressive: true,
             interlaced: true
         })))
-        .pipe(gulp.dest('build/img'));
+        .pipe(gulp.dest('build/example_images'));
 });
 
 // Fonts
 gulp.task('fonts', function() {
-    return gulp.src('node_modules/bootstrap/fonts/**')
+    return gulp.src('fonts/**')
         .pipe(gulp.dest('build/fonts'));
 });
 
