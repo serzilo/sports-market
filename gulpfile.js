@@ -27,6 +27,7 @@ var del = require('del');
 var merge = require('merge-stream');
 var runSequence = require('run-sequence');
 var argv = require('minimist')(process.argv.slice(2));
+var spritesmith = require("gulp.spritesmith");
 
 // Settings
 var RELEASE = !!argv.release; // Minimize and optimize during a build?
@@ -89,6 +90,10 @@ gulp.task('pages', function() {
 });
 
 // CSS style sheets
+gulp.task('styles_full', ['sprite'], function(cb) {
+    runSequence(['styles'], cb);
+});
+
 gulp.task('styles', function() {
     src.styles = 'styles/**/*.{css,less}';
     return gulp.src('styles/bootstrap.less')
@@ -102,9 +107,31 @@ gulp.task('styles', function() {
         .pipe(gulp.dest('build/css'));
 });
 
+gulp.task('sprite', function() {
+    src.spriteImages = 'images/**/*.*';
+
+    var spriteData =
+        gulp.src(src.spriteImages) //path to source
+        .pipe(spritesmith({
+            imgName: 'sprite.png', //sprite file name
+            cssName: 'sprite-position.less', //sprite less name where are stored image position
+            imgPath: '../images/sprite.png', //path to sprite file
+            cssFormat: 'less', //css format
+            cssTemplate: 'template.mustache', //mask file
+            cssVarMap: function(sprite) {
+                sprite.name = 'icon-' + sprite.name //sprite name format, ex. 'icon-logo' for logo.png
+            }
+        }));
+
+    spriteData.img
+        .pipe(gulp.dest('build/images/')); //path to save sprite file on build
+    spriteData.css
+        .pipe(gulp.dest('styles/sprite/')); //path to save style file on build
+});
+
 // Build
 gulp.task('build', ['clean'], function(cb) {
-    runSequence(['images', 'fonts', 'pages', 'styles'], cb);
+    runSequence(['images', 'fonts', 'pages', 'styles_full'], cb);
 });
 
 // Run BrowserSync
@@ -142,6 +169,7 @@ gulp.task('serve', ['build'], function() {
     gulp.watch(src.images, ['images']);
     gulp.watch(src.pages, ['pages']);
     gulp.watch(src.styles, ['styles']);
+    gulp.watch(src.spriteImages, ['sprite']);
     gulp.watch('./build/**/*.*', function(file) {
         browserSync.reload(path.relative(__dirname, file.path));
     });
